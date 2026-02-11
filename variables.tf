@@ -161,12 +161,12 @@ EOT
     resource_group_name            = string
     vm_size                        = string
     display_name                   = optional(string)
-    inter_node_communication       = optional(string, "Enabled")
+    inter_node_communication       = optional(string) # Default: "Enabled"
     license_type                   = optional(string)
-    max_tasks_per_node             = optional(number, 1)
+    max_tasks_per_node             = optional(number) # Default: 1
     metadata                       = optional(map(string))
     os_disk_placement              = optional(string)
-    stop_pending_resize_operation  = optional(bool, false)
+    stop_pending_resize_operation  = optional(bool) # Default: false
     target_node_communication_mode = optional(string)
     storage_image_reference = object({
       id        = optional(string)
@@ -204,12 +204,12 @@ EOT
       task_retry_maximum = optional(number)
       user_identity = object({
         auto_user = optional(object({
-          elevation_level = optional(string, "NonAdmin")
-          scope           = optional(string, "Task")
+          elevation_level = optional(string) # Default: "NonAdmin"
+          scope           = optional(string) # Default: "Task"
         }))
         user_name = optional(string)
       })
-      wait_for_success = optional(bool, false)
+      wait_for_success = optional(bool) # Default: false
     }))
     security_profile = optional(object({
       host_encryption_enabled = optional(bool)
@@ -218,11 +218,11 @@ EOT
       vtpm_enabled            = optional(bool)
     }))
     node_placement = optional(object({
-      policy = optional(string, "Regional")
+      policy = optional(string) # Default: "Regional"
     }))
     network_configuration = optional(object({
-      accelerated_networking_enabled = optional(bool, false)
-      dynamic_vnet_assignment_scope  = optional(string, "none")
+      accelerated_networking_enabled = optional(bool)   # Default: false
+      dynamic_vnet_assignment_scope  = optional(string) # Default: "none"
       endpoint_configuration = optional(object({
         backend_port        = number
         frontend_port_range = string
@@ -301,10 +301,10 @@ EOT
       disk_encryption_target = string
     }))
     data_disks = optional(object({
-      caching              = optional(string, "ReadOnly")
+      caching              = optional(string) # Default: "ReadOnly"
       disk_size_gb         = number
       lun                  = number
-      storage_account_type = optional(string, "Standard_LRS")
+      storage_account_type = optional(string) # Default: "Standard_LRS"
     }))
     container_configuration = optional(object({
       container_image_names = optional(set(string))
@@ -323,17 +323,17 @@ EOT
       visibility     = optional(set(string))
     }))
     auto_scale = optional(object({
-      evaluation_interval = optional(string, "PT15M")
+      evaluation_interval = optional(string) # Default: "PT15M"
       formula             = string
     }))
     fixed_scale = optional(object({
       node_deallocation_method  = optional(string)
-      resize_timeout            = optional(string, "PT15M")
-      target_dedicated_nodes    = optional(number, 1)
-      target_low_priority_nodes = optional(number, 0)
+      resize_timeout            = optional(string) # Default: "PT15M"
+      target_dedicated_nodes    = optional(number) # Default: 1
+      target_low_priority_nodes = optional(number) # Default: 0
     }))
     windows = optional(object({
-      enable_automatic_updates = optional(bool, true)
+      enable_automatic_updates = optional(bool) # Default: true
     }))
   }))
 }
