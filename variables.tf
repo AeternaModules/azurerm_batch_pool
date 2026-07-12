@@ -175,24 +175,24 @@ EOT
       sku       = optional(string)
       version   = optional(string)
     })
-    task_scheduling_policy = optional(object({
+    task_scheduling_policy = optional(list(object({
       node_fill_type = optional(string)
-    }))
+    })))
     start_task = optional(object({
       command_line                  = string
       common_environment_properties = optional(map(string))
-      container = optional(object({
+      container = optional(list(object({
         image_name = string
-        registry = optional(object({
+        registry = optional(list(object({
           password                  = optional(string)
           registry_server           = string
           user_assigned_identity_id = optional(string)
           user_name                 = optional(string)
-        }))
+        })))
         run_options       = optional(string)
         working_directory = optional(string)
-      }))
-      resource_file = optional(object({
+      })))
+      resource_file = optional(list(object({
         auto_storage_container_name = optional(string)
         blob_prefix                 = optional(string)
         file_mode                   = optional(string)
@@ -200,7 +200,7 @@ EOT
         http_url                    = optional(string)
         storage_container_url       = optional(string)
         user_assigned_identity_id   = optional(string)
-      }))
+      })))
       task_retry_maximum = optional(number)
       user_identity = object({
         auto_user = optional(object({
@@ -217,29 +217,29 @@ EOT
       security_type           = optional(string)
       vtpm_enabled            = optional(bool)
     }))
-    node_placement = optional(object({
+    node_placement = optional(list(object({
       policy = optional(string) # Default: "Regional"
-    }))
+    })))
     network_configuration = optional(object({
       accelerated_networking_enabled = optional(bool)   # Default: false
       dynamic_vnet_assignment_scope  = optional(string) # Default: "none"
-      endpoint_configuration = optional(object({
+      endpoint_configuration = optional(list(object({
         backend_port        = number
         frontend_port_range = string
         name                = string
-        network_security_group_rules = optional(object({
+        network_security_group_rules = optional(list(object({
           access                = string
           priority              = number
           source_address_prefix = string
           source_port_ranges    = optional(list(string))
-        }))
+        })))
         protocol = string
-      }))
+      })))
       public_address_provisioning_type = optional(string)
       public_ips                       = optional(set(string))
       subnet_id                        = optional(string)
     }))
-    mount = optional(object({
+    mount = optional(list(object({
       azure_blob_file_system = optional(object({
         account_key         = optional(string)
         account_name        = string
@@ -249,44 +249,44 @@ EOT
         relative_mount_path = string
         sas_key             = optional(string)
       }))
-      azure_file_share = optional(object({
+      azure_file_share = optional(list(object({
         account_key         = string
         account_name        = string
         azure_file_url      = string
         mount_options       = optional(string)
         relative_mount_path = string
-      }))
-      cifs_mount = optional(object({
+      })))
+      cifs_mount = optional(list(object({
         mount_options       = optional(string)
         password            = string
         relative_mount_path = string
         source              = string
         user_name           = string
-      }))
-      nfs_mount = optional(object({
+      })))
+      nfs_mount = optional(list(object({
         mount_options       = optional(string)
         relative_mount_path = string
         source              = string
-      }))
-    }))
-    user_accounts = optional(object({
+      })))
+    })))
+    user_accounts = optional(list(object({
       elevation_level = string
-      linux_user_configuration = optional(object({
+      linux_user_configuration = optional(list(object({
         gid             = optional(number)
         ssh_private_key = optional(string)
         uid             = optional(number)
-      }))
+      })))
       name     = string
       password = string
-      windows_user_configuration = optional(object({
+      windows_user_configuration = optional(list(object({
         login_mode = string
-      }))
-    }))
+      })))
+    })))
     identity = optional(object({
       identity_ids = set(string)
       type         = string
     }))
-    extensions = optional(object({
+    extensions = optional(list(object({
       auto_upgrade_minor_version = optional(bool)
       automatic_upgrade_enabled  = optional(bool)
       name                       = string
@@ -296,32 +296,32 @@ EOT
       settings_json              = optional(string)
       type                       = string
       type_handler_version       = optional(string)
-    }))
-    disk_encryption = optional(object({
+    })))
+    disk_encryption = optional(list(object({
       disk_encryption_target = string
-    }))
-    data_disks = optional(object({
+    })))
+    data_disks = optional(list(object({
       caching              = optional(string) # Default: "ReadOnly"
       disk_size_gb         = number
       lun                  = number
       storage_account_type = optional(string) # Default: "Standard_LRS"
-    }))
+    })))
     container_configuration = optional(object({
       container_image_names = optional(set(string))
-      container_registries = optional(object({
+      container_registries = optional(list(object({
         password                  = optional(string)
         registry_server           = string
         user_assigned_identity_id = optional(string)
         user_name                 = optional(string)
-      }))
+      })))
       type = optional(string)
     }))
-    certificate = optional(object({
+    certificate = optional(list(object({
       id             = string
       store_location = string
       store_name     = optional(string)
       visibility     = optional(set(string))
-    }))
+    })))
     auto_scale = optional(object({
       evaluation_interval = optional(string) # Default: "PT15M"
       formula             = string
@@ -332,354 +332,10 @@ EOT
       target_dedicated_nodes    = optional(number) # Default: 1
       target_low_priority_nodes = optional(number) # Default: 0
     }))
-    windows = optional(object({
+    windows = optional(list(object({
       enable_automatic_updates = optional(bool) # Default: true
-    }))
+    })))
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.max_tasks_per_node == null || (v.max_tasks_per_node >= 1)
-      )
-    ])
-    error_message = "must be at least 1"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.fixed_scale == null || (v.fixed_scale.target_dedicated_nodes == null || (v.fixed_scale.target_dedicated_nodes >= 0 && v.fixed_scale.target_dedicated_nodes <= 2000))
-      )
-    ])
-    error_message = "must be between 0 and 2000"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.fixed_scale == null || (v.fixed_scale.target_low_priority_nodes == null || (v.fixed_scale.target_low_priority_nodes >= 0 && v.fixed_scale.target_low_priority_nodes <= 1000))
-      )
-    ])
-    error_message = "must be between 0 and 1000"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.container_configuration == null || (v.container_configuration.type == null || (length(v.container_configuration.type) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.container_configuration == null || (v.container_configuration.container_image_names == null || (length(v.container_configuration.container_image_names) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.storage_image_reference.publisher == null || (length(v.storage_image_reference.publisher) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.storage_image_reference.offer == null || (length(v.storage_image_reference.offer) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.storage_image_reference.sku == null || (length(v.storage_image_reference.sku) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.storage_image_reference.version == null || (length(v.storage_image_reference.version) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.metadata == null || (length(v.metadata) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.azure_blob_file_system == null || (length(v.mount.azure_blob_file_system.account_name) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.azure_blob_file_system == null || (length(v.mount.azure_blob_file_system.container_name) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.azure_blob_file_system == null || (length(v.mount.azure_blob_file_system.relative_mount_path) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.azure_blob_file_system == null || (v.mount.azure_blob_file_system.account_key == null || (length(v.mount.azure_blob_file_system.account_key) > 0)))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.azure_blob_file_system == null || (v.mount.azure_blob_file_system.sas_key == null || (length(v.mount.azure_blob_file_system.sas_key) > 0)))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.azure_blob_file_system == null || (v.mount.azure_blob_file_system.blobfuse_options == null || (length(v.mount.azure_blob_file_system.blobfuse_options) > 0)))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.azure_file_share == null || (length(v.mount.azure_file_share.account_name) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.azure_file_share == null || (length(v.mount.azure_file_share.account_key) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.azure_file_share == null || (length(v.mount.azure_file_share.relative_mount_path) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.azure_file_share == null || (v.mount.azure_file_share.mount_options == null || (length(v.mount.azure_file_share.mount_options) > 0)))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.cifs_mount == null || (length(v.mount.cifs_mount.user_name) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.cifs_mount == null || (length(v.mount.cifs_mount.source) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.cifs_mount == null || (length(v.mount.cifs_mount.relative_mount_path) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.cifs_mount == null || (v.mount.cifs_mount.mount_options == null || (length(v.mount.cifs_mount.mount_options) > 0)))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.cifs_mount == null || (length(v.mount.cifs_mount.password) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.nfs_mount == null || (length(v.mount.nfs_mount.source) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.nfs_mount == null || (length(v.mount.nfs_mount.relative_mount_path) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.mount == null || (v.mount.nfs_mount == null || (v.mount.nfs_mount.mount_options == null || (length(v.mount.nfs_mount.mount_options) > 0)))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.network_configuration == null || (v.network_configuration.subnet_id == null || (length(v.network_configuration.subnet_id) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.network_configuration == null || (v.network_configuration.endpoint_configuration == null || (length(v.network_configuration.endpoint_configuration.name) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.network_configuration == null || (v.network_configuration.endpoint_configuration == null || (v.network_configuration.endpoint_configuration.network_security_group_rules == null || (v.network_configuration.endpoint_configuration.network_security_group_rules.priority >= 150)))
-      )
-    ])
-    error_message = "must be at least 150"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.network_configuration == null || (v.network_configuration.endpoint_configuration == null || (v.network_configuration.endpoint_configuration.network_security_group_rules == null || (length(v.network_configuration.endpoint_configuration.network_security_group_rules.source_address_prefix) > 0)))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.network_configuration == null || (v.network_configuration.endpoint_configuration == null || (v.network_configuration.endpoint_configuration.network_security_group_rules == null || (v.network_configuration.endpoint_configuration.network_security_group_rules.source_port_ranges == null || (length(v.network_configuration.endpoint_configuration.network_security_group_rules.source_port_ranges) > 0))))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.data_disks == null || (v.data_disks.lun >= 0 && v.data_disks.lun <= 63)
-      )
-    ])
-    error_message = "must be between 0 and 63"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.data_disks == null || (v.data_disks.disk_size_gb >= 0)
-      )
-    ])
-    error_message = "must be at least 0"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.extensions == null || (length(v.extensions.name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.extensions == null || (length(v.extensions.publisher) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.extensions == null || (length(v.extensions.type) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.extensions == null || (v.extensions.type_handler_version == null || (length(v.extensions.type_handler_version) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.extensions == null || (v.extensions.provision_after_extensions == null || (length(v.extensions.provision_after_extensions) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.license_type == null || (length(v.license_type) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.user_accounts == null || (length(v.user_accounts.name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.batch_pools : (
-        v.user_accounts == null || (length(v.user_accounts.password) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_batch_pool's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
@@ -714,28 +370,118 @@ EOT
   #   condition: length(value) <= 24
   #   message:   [from validate.AccountName: invalid when len(value) > 24]
   #   source:    [from validate.AccountName: invalid when len(value) > 24]
+  # path: max_tasks_per_node
+  #   condition: value >= 1
+  #   message:   must be at least 1
   # path: fixed_scale.node_deallocation_method
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: fixed_scale.target_dedicated_nodes
+  #   condition: value >= 0 && value <= 2000
+  #   message:   must be between 0 and 2000
+  # path: fixed_scale.target_low_priority_nodes
+  #   condition: value >= 0 && value <= 1000
+  #   message:   must be between 0 and 1000
+  # path: container_configuration.type
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: container_configuration.container_image_names[*]
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: storage_image_reference.id
   #   source:    [from azure.ValidateResourceID] !ok
   # path: storage_image_reference.id
   #   source:    [from azure.ValidateResourceID] err != nil
+  # path: storage_image_reference.publisher
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: storage_image_reference.offer
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: storage_image_reference.sku
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: storage_image_reference.version
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: identity.type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: identity.identity_ids[*]
   #   source:    [from commonids.ValidateUserAssignedIdentityID] !ok
   # path: identity.identity_ids[*]
   #   source:    [from commonids.ValidateUserAssignedIdentityID] err != nil
+  # path: metadata[*]
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.azure_blob_file_system.account_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.azure_blob_file_system.container_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.azure_blob_file_system.relative_mount_path
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.azure_blob_file_system.account_key
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.azure_blob_file_system.sas_key
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: mount.azure_blob_file_system.identity_id
   #   source:    [from commonids.ValidateUserAssignedIdentityID] !ok
   # path: mount.azure_blob_file_system.identity_id
   #   source:    [from commonids.ValidateUserAssignedIdentityID] err != nil
+  # path: mount.azure_blob_file_system.blobfuse_options
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.azure_file_share.account_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: mount.azure_file_share.azure_file_url
   #   source:    validation.IsURLWithHTTPS(...) - no translation rule yet, add one
+  # path: mount.azure_file_share.account_key
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.azure_file_share.relative_mount_path
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.azure_file_share.mount_options
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.cifs_mount.user_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.cifs_mount.source
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.cifs_mount.relative_mount_path
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.cifs_mount.mount_options
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.cifs_mount.password
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.nfs_mount.source
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.nfs_mount.relative_mount_path
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: mount.nfs_mount.mount_options
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: network_configuration.dynamic_vnet_assignment_scope
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: network_configuration.subnet_id
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: network_configuration.public_address_provisioning_type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: network_configuration.endpoint_configuration.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: network_configuration.endpoint_configuration.protocol
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: network_configuration.endpoint_configuration.backend_port
@@ -754,18 +500,51 @@ EOT
   #   source:    [from validate.FrontendPortRange] !validPortNumber(startPort) || !validPortNumber(endPort)
   # path: network_configuration.endpoint_configuration.frontend_port_range
   #   source:    [from validate.FrontendPortRange] endPort-startPort < 100
+  # path: network_configuration.endpoint_configuration.network_security_group_rules.priority
+  #   condition: value >= 150
+  #   message:   must be at least 150
   # path: network_configuration.endpoint_configuration.network_security_group_rules.access
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: network_configuration.endpoint_configuration.network_security_group_rules.source_address_prefix
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: network_configuration.endpoint_configuration.network_security_group_rules.source_port_ranges[*]
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: data_disks.lun
+  #   condition: value >= 0 && value <= 63
+  #   message:   must be between 0 and 63
   # path: data_disks.caching
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: data_disks.disk_size_gb
+  #   condition: value >= 0
+  #   message:   must be at least 0
   # path: data_disks.storage_account_type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: disk_encryption.disk_encryption_target
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: extensions.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: extensions.publisher
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: extensions.type
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: extensions.type_handler_version
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: extensions.settings_json
   #   source:    validation.StringIsJSON(...) - no translation rule yet, add one
+  # path: extensions.provision_after_extensions[*]
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: node_placement.policy
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: license_type
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: os_disk_placement
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: inter_node_communication
@@ -776,6 +555,12 @@ EOT
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: task_scheduling_policy.node_fill_type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: user_accounts.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: user_accounts.password
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: user_accounts.elevation_level
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: user_accounts.windows_user_configuration.login_mode

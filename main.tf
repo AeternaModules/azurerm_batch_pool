@@ -32,7 +32,7 @@ resource "azurerm_batch_pool" "batch_pools" {
   }
 
   dynamic "certificate" {
-    for_each = each.value.certificate != null ? [each.value.certificate] : []
+    for_each = each.value.certificate != null ? each.value.certificate : []
     content {
       id             = certificate.value.id
       store_location = certificate.value.store_location
@@ -46,7 +46,7 @@ resource "azurerm_batch_pool" "batch_pools" {
     content {
       container_image_names = container_configuration.value.container_image_names
       dynamic "container_registries" {
-        for_each = container_configuration.value.container_registries != null ? [container_configuration.value.container_registries] : []
+        for_each = container_configuration.value.container_registries != null ? container_configuration.value.container_registries : []
         content {
           password                  = container_registries.value.password
           registry_server           = container_registries.value.registry_server
@@ -59,7 +59,7 @@ resource "azurerm_batch_pool" "batch_pools" {
   }
 
   dynamic "data_disks" {
-    for_each = each.value.data_disks != null ? [each.value.data_disks] : []
+    for_each = each.value.data_disks != null ? each.value.data_disks : []
     content {
       caching              = data_disks.value.caching
       disk_size_gb         = data_disks.value.disk_size_gb
@@ -69,14 +69,14 @@ resource "azurerm_batch_pool" "batch_pools" {
   }
 
   dynamic "disk_encryption" {
-    for_each = each.value.disk_encryption != null ? [each.value.disk_encryption] : []
+    for_each = each.value.disk_encryption != null ? each.value.disk_encryption : []
     content {
       disk_encryption_target = disk_encryption.value.disk_encryption_target
     }
   }
 
   dynamic "extensions" {
-    for_each = each.value.extensions != null ? [each.value.extensions] : []
+    for_each = each.value.extensions != null ? each.value.extensions : []
     content {
       auto_upgrade_minor_version = extensions.value.auto_upgrade_minor_version
       automatic_upgrade_enabled  = extensions.value.automatic_upgrade_enabled
@@ -109,7 +109,7 @@ resource "azurerm_batch_pool" "batch_pools" {
   }
 
   dynamic "mount" {
-    for_each = each.value.mount != null ? [each.value.mount] : []
+    for_each = each.value.mount != null ? each.value.mount : []
     content {
       dynamic "azure_blob_file_system" {
         for_each = mount.value.azure_blob_file_system != null ? [mount.value.azure_blob_file_system] : []
@@ -124,7 +124,7 @@ resource "azurerm_batch_pool" "batch_pools" {
         }
       }
       dynamic "azure_file_share" {
-        for_each = mount.value.azure_file_share != null ? [mount.value.azure_file_share] : []
+        for_each = mount.value.azure_file_share != null ? mount.value.azure_file_share : []
         content {
           account_key         = azure_file_share.value.account_key
           account_name        = azure_file_share.value.account_name
@@ -134,7 +134,7 @@ resource "azurerm_batch_pool" "batch_pools" {
         }
       }
       dynamic "cifs_mount" {
-        for_each = mount.value.cifs_mount != null ? [mount.value.cifs_mount] : []
+        for_each = mount.value.cifs_mount != null ? mount.value.cifs_mount : []
         content {
           mount_options       = cifs_mount.value.mount_options
           password            = cifs_mount.value.password
@@ -144,7 +144,7 @@ resource "azurerm_batch_pool" "batch_pools" {
         }
       }
       dynamic "nfs_mount" {
-        for_each = mount.value.nfs_mount != null ? [mount.value.nfs_mount] : []
+        for_each = mount.value.nfs_mount != null ? mount.value.nfs_mount : []
         content {
           mount_options       = nfs_mount.value.mount_options
           relative_mount_path = nfs_mount.value.relative_mount_path
@@ -160,13 +160,13 @@ resource "azurerm_batch_pool" "batch_pools" {
       accelerated_networking_enabled = network_configuration.value.accelerated_networking_enabled
       dynamic_vnet_assignment_scope  = network_configuration.value.dynamic_vnet_assignment_scope
       dynamic "endpoint_configuration" {
-        for_each = network_configuration.value.endpoint_configuration != null ? [network_configuration.value.endpoint_configuration] : []
+        for_each = network_configuration.value.endpoint_configuration != null ? network_configuration.value.endpoint_configuration : []
         content {
           backend_port        = endpoint_configuration.value.backend_port
           frontend_port_range = endpoint_configuration.value.frontend_port_range
           name                = endpoint_configuration.value.name
           dynamic "network_security_group_rules" {
-            for_each = endpoint_configuration.value.network_security_group_rules != null ? [endpoint_configuration.value.network_security_group_rules] : []
+            for_each = endpoint_configuration.value.network_security_group_rules != null ? endpoint_configuration.value.network_security_group_rules : []
             content {
               access                = network_security_group_rules.value.access
               priority              = network_security_group_rules.value.priority
@@ -184,7 +184,7 @@ resource "azurerm_batch_pool" "batch_pools" {
   }
 
   dynamic "node_placement" {
-    for_each = each.value.node_placement != null ? [each.value.node_placement] : []
+    for_each = each.value.node_placement != null ? each.value.node_placement : []
     content {
       policy = node_placement.value.policy
     }
@@ -206,11 +206,11 @@ resource "azurerm_batch_pool" "batch_pools" {
       command_line                  = start_task.value.command_line
       common_environment_properties = start_task.value.common_environment_properties
       dynamic "container" {
-        for_each = start_task.value.container != null ? [start_task.value.container] : []
+        for_each = start_task.value.container != null ? start_task.value.container : []
         content {
           image_name = container.value.image_name
           dynamic "registry" {
-            for_each = container.value.registry != null ? [container.value.registry] : []
+            for_each = container.value.registry != null ? container.value.registry : []
             content {
               password                  = registry.value.password
               registry_server           = registry.value.registry_server
@@ -223,7 +223,7 @@ resource "azurerm_batch_pool" "batch_pools" {
         }
       }
       dynamic "resource_file" {
-        for_each = start_task.value.resource_file != null ? [start_task.value.resource_file] : []
+        for_each = start_task.value.resource_file != null ? start_task.value.resource_file : []
         content {
           auto_storage_container_name = resource_file.value.auto_storage_container_name
           blob_prefix                 = resource_file.value.blob_prefix
@@ -250,18 +250,18 @@ resource "azurerm_batch_pool" "batch_pools" {
   }
 
   dynamic "task_scheduling_policy" {
-    for_each = each.value.task_scheduling_policy != null ? [each.value.task_scheduling_policy] : []
+    for_each = each.value.task_scheduling_policy != null ? each.value.task_scheduling_policy : []
     content {
       node_fill_type = task_scheduling_policy.value.node_fill_type
     }
   }
 
   dynamic "user_accounts" {
-    for_each = each.value.user_accounts != null ? [each.value.user_accounts] : []
+    for_each = each.value.user_accounts != null ? each.value.user_accounts : []
     content {
       elevation_level = user_accounts.value.elevation_level
       dynamic "linux_user_configuration" {
-        for_each = user_accounts.value.linux_user_configuration != null ? [user_accounts.value.linux_user_configuration] : []
+        for_each = user_accounts.value.linux_user_configuration != null ? user_accounts.value.linux_user_configuration : []
         content {
           gid             = linux_user_configuration.value.gid
           ssh_private_key = linux_user_configuration.value.ssh_private_key
@@ -271,7 +271,7 @@ resource "azurerm_batch_pool" "batch_pools" {
       name     = user_accounts.value.name
       password = user_accounts.value.password
       dynamic "windows_user_configuration" {
-        for_each = user_accounts.value.windows_user_configuration != null ? [user_accounts.value.windows_user_configuration] : []
+        for_each = user_accounts.value.windows_user_configuration != null ? user_accounts.value.windows_user_configuration : []
         content {
           login_mode = windows_user_configuration.value.login_mode
         }
@@ -280,7 +280,7 @@ resource "azurerm_batch_pool" "batch_pools" {
   }
 
   dynamic "windows" {
-    for_each = each.value.windows != null ? [each.value.windows] : []
+    for_each = each.value.windows != null ? each.value.windows : []
     content {
       enable_automatic_updates = windows.value.enable_automatic_updates
     }
