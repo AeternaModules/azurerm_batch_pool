@@ -34,7 +34,7 @@ Optional:
         - container_image_names (optional)
         - container_registries (optional, block):
             - password (optional)
-            - registry_server (required)
+            - registry_server (optional)
             - user_assigned_identity_id (optional)
             - user_name (optional)
         - type (optional)
@@ -161,12 +161,12 @@ EOT
     resource_group_name            = string
     vm_size                        = string
     display_name                   = optional(string)
-    inter_node_communication       = optional(string) # Default: "Enabled"
+    inter_node_communication       = optional(string)
     license_type                   = optional(string)
-    max_tasks_per_node             = optional(number) # Default: 1
+    max_tasks_per_node             = optional(number)
     metadata                       = optional(map(string))
     os_disk_placement              = optional(string)
-    stop_pending_resize_operation  = optional(bool) # Default: false
+    stop_pending_resize_operation  = optional(bool)
     target_node_communication_mode = optional(string)
     storage_image_reference = object({
       id        = optional(string)
@@ -204,12 +204,12 @@ EOT
       task_retry_maximum = optional(number)
       user_identity = object({
         auto_user = optional(object({
-          elevation_level = optional(string) # Default: "NonAdmin"
-          scope           = optional(string) # Default: "Task"
+          elevation_level = optional(string)
+          scope           = optional(string)
         }))
         user_name = optional(string)
       })
-      wait_for_success = optional(bool) # Default: false
+      wait_for_success = optional(bool)
     }))
     security_profile = optional(object({
       host_encryption_enabled = optional(bool)
@@ -218,11 +218,11 @@ EOT
       vtpm_enabled            = optional(bool)
     }))
     node_placement = optional(list(object({
-      policy = optional(string) # Default: "Regional"
+      policy = optional(string)
     })))
     network_configuration = optional(object({
-      accelerated_networking_enabled = optional(bool)   # Default: false
-      dynamic_vnet_assignment_scope  = optional(string) # Default: "none"
+      accelerated_networking_enabled = optional(bool)
+      dynamic_vnet_assignment_scope  = optional(string)
       endpoint_configuration = optional(list(object({
         backend_port        = number
         frontend_port_range = string
@@ -301,16 +301,16 @@ EOT
       disk_encryption_target = string
     })))
     data_disks = optional(list(object({
-      caching              = optional(string) # Default: "ReadOnly"
+      caching              = optional(string)
       disk_size_gb         = number
       lun                  = number
-      storage_account_type = optional(string) # Default: "Standard_LRS"
+      storage_account_type = optional(string)
     })))
     container_configuration = optional(object({
       container_image_names = optional(set(string))
       container_registries = optional(list(object({
         password                  = optional(string)
-        registry_server           = string
+        registry_server           = optional(string)
         user_assigned_identity_id = optional(string)
         user_name                 = optional(string)
       })))
@@ -323,17 +323,17 @@ EOT
       visibility     = optional(set(string))
     })))
     auto_scale = optional(object({
-      evaluation_interval = optional(string) # Default: "PT15M"
+      evaluation_interval = optional(string)
       formula             = string
     }))
     fixed_scale = optional(object({
       node_deallocation_method  = optional(string)
-      resize_timeout            = optional(string) # Default: "PT15M"
-      target_dedicated_nodes    = optional(number) # Default: 1
-      target_low_priority_nodes = optional(number) # Default: 0
+      resize_timeout            = optional(string)
+      target_dedicated_nodes    = optional(number)
+      target_low_priority_nodes = optional(number)
     }))
     windows = optional(list(object({
-      enable_automatic_updates = optional(bool) # Default: true
+      enable_automatic_updates = optional(bool)
     })))
   }))
   # --- Unconfirmed validation candidates, derived from azurerm_batch_pool's provider source ---
