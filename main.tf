@@ -31,16 +31,6 @@ resource "azurerm_batch_pool" "batch_pools" {
     }
   }
 
-  dynamic "certificate" {
-    for_each = each.value.certificate != null ? each.value.certificate : []
-    content {
-      id             = certificate.value.id
-      store_location = certificate.value.store_location
-      store_name     = certificate.value.store_name
-      visibility     = certificate.value.visibility
-    }
-  }
-
   dynamic "container_configuration" {
     for_each = each.value.container_configuration != null ? [each.value.container_configuration] : []
     content {

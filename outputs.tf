@@ -10,10 +10,6 @@ output "batch_pools_auto_scale" {
   description = "Map of auto_scale values across all batch_pools, keyed the same as var.batch_pools"
   value       = { for k, v in azurerm_batch_pool.batch_pools : k => v.auto_scale if v.auto_scale != null && length(v.auto_scale) > 0 }
 }
-output "batch_pools_certificate" {
-  description = "Map of certificate values across all batch_pools, keyed the same as var.batch_pools"
-  value       = { for k, v in azurerm_batch_pool.batch_pools : k => v.certificate if v.certificate != null && length(v.certificate) > 0 }
-}
 output "batch_pools_container_configuration" {
   description = "Map of container_configuration values across all batch_pools, keyed the same as var.batch_pools"
   value       = { for k, v in azurerm_batch_pool.batch_pools : k => v.container_configuration if v.container_configuration != null && length(v.container_configuration) > 0 }

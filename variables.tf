@@ -25,11 +25,6 @@ Optional:
     - auto_scale (block):
         - evaluation_interval (optional)
         - formula (required)
-    - certificate (block):
-        - id (required)
-        - store_location (required)
-        - store_name (optional)
-        - visibility (optional)
     - container_configuration (block):
         - container_image_names (optional)
         - container_registries (optional, block):
@@ -175,9 +170,108 @@ EOT
       sku       = optional(string)
       version   = optional(string)
     })
-    task_scheduling_policy = optional(list(object({
-      node_fill_type = optional(string)
+    auto_scale = optional(object({
+      evaluation_interval = optional(string)
+      formula             = string
+    }))
+    container_configuration = optional(object({
+      container_image_names = optional(set(string))
+      container_registries = optional(list(object({
+        password                  = optional(string)
+        registry_server           = optional(string)
+        user_assigned_identity_id = optional(string)
+        user_name                 = optional(string)
+      })))
+      type = optional(string)
+    }))
+    data_disks = optional(list(object({
+      caching              = optional(string)
+      disk_size_gb         = number
+      lun                  = number
+      storage_account_type = optional(string)
     })))
+    disk_encryption = optional(list(object({
+      disk_encryption_target = string
+    })))
+    extensions = optional(list(object({
+      auto_upgrade_minor_version = optional(bool)
+      automatic_upgrade_enabled  = optional(bool)
+      name                       = string
+      protected_settings         = optional(string)
+      provision_after_extensions = optional(set(string))
+      publisher                  = string
+      settings_json              = optional(string)
+      type                       = string
+      type_handler_version       = optional(string)
+    })))
+    fixed_scale = optional(object({
+      node_deallocation_method  = optional(string)
+      resize_timeout            = optional(string)
+      target_dedicated_nodes    = optional(number)
+      target_low_priority_nodes = optional(number)
+    }))
+    identity = optional(object({
+      identity_ids = set(string)
+      type         = string
+    }))
+    mount = optional(list(object({
+      azure_blob_file_system = optional(object({
+        account_key         = optional(string)
+        account_name        = string
+        blobfuse_options    = optional(string)
+        container_name      = string
+        identity_id         = optional(string)
+        relative_mount_path = string
+        sas_key             = optional(string)
+      }))
+      azure_file_share = optional(list(object({
+        account_key         = string
+        account_name        = string
+        azure_file_url      = string
+        mount_options       = optional(string)
+        relative_mount_path = string
+      })))
+      cifs_mount = optional(list(object({
+        mount_options       = optional(string)
+        password            = string
+        relative_mount_path = string
+        source              = string
+        user_name           = string
+      })))
+      nfs_mount = optional(list(object({
+        mount_options       = optional(string)
+        relative_mount_path = string
+        source              = string
+      })))
+    })))
+    network_configuration = optional(object({
+      accelerated_networking_enabled = optional(bool)
+      dynamic_vnet_assignment_scope  = optional(string)
+      endpoint_configuration = optional(list(object({
+        backend_port        = number
+        frontend_port_range = string
+        name                = string
+        network_security_group_rules = optional(list(object({
+          access                = string
+          priority              = number
+          source_address_prefix = string
+          source_port_ranges    = optional(list(string))
+        })))
+        protocol = string
+      })))
+      public_address_provisioning_type = optional(string)
+      public_ips                       = optional(set(string))
+      subnet_id                        = optional(string)
+    }))
+    node_placement = optional(list(object({
+      policy = optional(string)
+    })))
+    security_profile = optional(object({
+      host_encryption_enabled = optional(bool)
+      secure_boot_enabled     = optional(bool)
+      security_type           = optional(string)
+      vtpm_enabled            = optional(bool)
+    }))
     start_task = optional(object({
       command_line                  = string
       common_environment_properties = optional(map(string))
@@ -211,63 +305,8 @@ EOT
       })
       wait_for_success = optional(bool)
     }))
-    security_profile = optional(object({
-      host_encryption_enabled = optional(bool)
-      secure_boot_enabled     = optional(bool)
-      security_type           = optional(string)
-      vtpm_enabled            = optional(bool)
-    }))
-    node_placement = optional(list(object({
-      policy = optional(string)
-    })))
-    network_configuration = optional(object({
-      accelerated_networking_enabled = optional(bool)
-      dynamic_vnet_assignment_scope  = optional(string)
-      endpoint_configuration = optional(list(object({
-        backend_port        = number
-        frontend_port_range = string
-        name                = string
-        network_security_group_rules = optional(list(object({
-          access                = string
-          priority              = number
-          source_address_prefix = string
-          source_port_ranges    = optional(list(string))
-        })))
-        protocol = string
-      })))
-      public_address_provisioning_type = optional(string)
-      public_ips                       = optional(set(string))
-      subnet_id                        = optional(string)
-    }))
-    mount = optional(list(object({
-      azure_blob_file_system = optional(object({
-        account_key         = optional(string)
-        account_name        = string
-        blobfuse_options    = optional(string)
-        container_name      = string
-        identity_id         = optional(string)
-        relative_mount_path = string
-        sas_key             = optional(string)
-      }))
-      azure_file_share = optional(list(object({
-        account_key         = string
-        account_name        = string
-        azure_file_url      = string
-        mount_options       = optional(string)
-        relative_mount_path = string
-      })))
-      cifs_mount = optional(list(object({
-        mount_options       = optional(string)
-        password            = string
-        relative_mount_path = string
-        source              = string
-        user_name           = string
-      })))
-      nfs_mount = optional(list(object({
-        mount_options       = optional(string)
-        relative_mount_path = string
-        source              = string
-      })))
+    task_scheduling_policy = optional(list(object({
+      node_fill_type = optional(string)
     })))
     user_accounts = optional(list(object({
       elevation_level = string
@@ -282,56 +321,6 @@ EOT
         login_mode = string
       })))
     })))
-    identity = optional(object({
-      identity_ids = set(string)
-      type         = string
-    }))
-    extensions = optional(list(object({
-      auto_upgrade_minor_version = optional(bool)
-      automatic_upgrade_enabled  = optional(bool)
-      name                       = string
-      protected_settings         = optional(string)
-      provision_after_extensions = optional(set(string))
-      publisher                  = string
-      settings_json              = optional(string)
-      type                       = string
-      type_handler_version       = optional(string)
-    })))
-    disk_encryption = optional(list(object({
-      disk_encryption_target = string
-    })))
-    data_disks = optional(list(object({
-      caching              = optional(string)
-      disk_size_gb         = number
-      lun                  = number
-      storage_account_type = optional(string)
-    })))
-    container_configuration = optional(object({
-      container_image_names = optional(set(string))
-      container_registries = optional(list(object({
-        password                  = optional(string)
-        registry_server           = optional(string)
-        user_assigned_identity_id = optional(string)
-        user_name                 = optional(string)
-      })))
-      type = optional(string)
-    }))
-    certificate = optional(list(object({
-      id             = string
-      store_location = string
-      store_name     = optional(string)
-      visibility     = optional(set(string))
-    })))
-    auto_scale = optional(object({
-      evaluation_interval = optional(string)
-      formula             = string
-    }))
-    fixed_scale = optional(object({
-      node_deallocation_method  = optional(string)
-      resize_timeout            = optional(string)
-      target_dedicated_nodes    = optional(number)
-      target_low_priority_nodes = optional(number)
-    }))
     windows = optional(list(object({
       enable_automatic_updates = optional(bool)
     })))
