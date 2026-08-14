@@ -8,7 +8,7 @@ output "batch_pools_account_name" {
 }
 output "batch_pools_auto_scale" {
   description = "Map of auto_scale values across all batch_pools, keyed the same as var.batch_pools"
-  value       = { for k, v in azurerm_batch_pool.batch_pools : k => v.auto_scale if v.auto_scale != null && length(v.auto_scale) > 0 }
+  value       = { for k, v in azurerm_batch_pool.batch_pools : k => one(v.auto_scale) if v.auto_scale != null && length(v.auto_scale) > 0 }
 }
 output "batch_pools_certificate" {
   description = "Map of certificate values across all batch_pools, keyed the same as var.batch_pools"
@@ -16,7 +16,7 @@ output "batch_pools_certificate" {
 }
 output "batch_pools_container_configuration" {
   description = "Map of container_configuration values across all batch_pools, keyed the same as var.batch_pools"
-  value       = { for k, v in azurerm_batch_pool.batch_pools : k => v.container_configuration if v.container_configuration != null && length(v.container_configuration) > 0 }
+  value       = { for k, v in azurerm_batch_pool.batch_pools : k => one(v.container_configuration) if v.container_configuration != null && length(v.container_configuration) > 0 }
 }
 output "batch_pools_data_disks" {
   description = "Map of data_disks values across all batch_pools, keyed the same as var.batch_pools"
@@ -37,11 +37,11 @@ output "batch_pools_extensions" {
 }
 output "batch_pools_fixed_scale" {
   description = "Map of fixed_scale values across all batch_pools, keyed the same as var.batch_pools"
-  value       = { for k, v in azurerm_batch_pool.batch_pools : k => v.fixed_scale if v.fixed_scale != null && length(v.fixed_scale) > 0 }
+  value       = { for k, v in azurerm_batch_pool.batch_pools : k => one(v.fixed_scale) if v.fixed_scale != null && length(v.fixed_scale) > 0 }
 }
 output "batch_pools_identity" {
   description = "Map of identity values across all batch_pools, keyed the same as var.batch_pools"
-  value       = { for k, v in azurerm_batch_pool.batch_pools : k => v.identity if v.identity != null && length(v.identity) > 0 }
+  value       = { for k, v in azurerm_batch_pool.batch_pools : k => one(v.identity) if v.identity != null && length(v.identity) > 0 }
 }
 output "batch_pools_inter_node_communication" {
   description = "Map of inter_node_communication values across all batch_pools, keyed the same as var.batch_pools"
@@ -70,7 +70,7 @@ output "batch_pools_name" {
 }
 output "batch_pools_network_configuration" {
   description = "Map of network_configuration values across all batch_pools, keyed the same as var.batch_pools"
-  value       = { for k, v in azurerm_batch_pool.batch_pools : k => v.network_configuration if v.network_configuration != null && length(v.network_configuration) > 0 }
+  value       = { for k, v in azurerm_batch_pool.batch_pools : k => one(v.network_configuration) if v.network_configuration != null && length(v.network_configuration) > 0 }
 }
 output "batch_pools_node_agent_sku_id" {
   description = "Map of node_agent_sku_id values across all batch_pools, keyed the same as var.batch_pools"
@@ -90,11 +90,11 @@ output "batch_pools_resource_group_name" {
 }
 output "batch_pools_security_profile" {
   description = "Map of security_profile values across all batch_pools, keyed the same as var.batch_pools"
-  value       = { for k, v in azurerm_batch_pool.batch_pools : k => v.security_profile if v.security_profile != null && length(v.security_profile) > 0 }
+  value       = { for k, v in azurerm_batch_pool.batch_pools : k => one(v.security_profile) if v.security_profile != null && length(v.security_profile) > 0 }
 }
 output "batch_pools_start_task" {
   description = "Map of start_task values across all batch_pools, keyed the same as var.batch_pools"
-  value       = { for k, v in azurerm_batch_pool.batch_pools : k => v.start_task if v.start_task != null && length(v.start_task) > 0 }
+  value       = { for k, v in azurerm_batch_pool.batch_pools : k => one(v.start_task) if v.start_task != null && length(v.start_task) > 0 }
   sensitive   = true
 }
 output "batch_pools_stop_pending_resize_operation" {
@@ -103,7 +103,7 @@ output "batch_pools_stop_pending_resize_operation" {
 }
 output "batch_pools_storage_image_reference" {
   description = "Map of storage_image_reference values across all batch_pools, keyed the same as var.batch_pools"
-  value       = { for k, v in azurerm_batch_pool.batch_pools : k => v.storage_image_reference if v.storage_image_reference != null && length(v.storage_image_reference) > 0 }
+  value       = { for k, v in azurerm_batch_pool.batch_pools : k => one(v.storage_image_reference) if v.storage_image_reference != null && length(v.storage_image_reference) > 0 }
 }
 output "batch_pools_target_node_communication_mode" {
   description = "Map of target_node_communication_mode values across all batch_pools, keyed the same as var.batch_pools"
